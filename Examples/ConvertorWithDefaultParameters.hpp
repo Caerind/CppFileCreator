@@ -15,10 +15,10 @@ class Convertor
 
     private:
 
-        void getInputFile();
-        void getOutputFile();
-        void getClassName();
-        void initialize();
+        void getInputFile(std::string a = "");
+        void getOutputFile(int b = 0);
+        void getClassName(float c, float d = 0.5);
+        void initialize(float e = 0.5, float f = 0);
 
         void run();
 

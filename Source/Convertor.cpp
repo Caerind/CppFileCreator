@@ -132,6 +132,7 @@ bool Convertor::cutLine()
     if(found == std::string::npos)
         return true;
     std::string p = mTempLine.substr(found,mTempLine.size()-1);
+    handleParameters(p);
     mTempLine = mTempLine.substr(0,found);
     std::stringstream stream(mTempLine);
     std::string temp;
@@ -140,6 +141,21 @@ bool Convertor::cutLine()
     if(mWords.size() < 2)
         return true;
     return false;
+}
+
+void Convertor::handleParameters(std::string& p)
+{
+    if(p == "()")
+        return;
+    while(p.find("=") != std::string::npos)
+    {
+        while(p.at(p.find("=")) != ',' && p.at(p.find("=")) != ')')
+            p.erase(p.find("="),1);
+        while(p.find(" ,") != std::string::npos)
+            p.erase(p.find(" ,"),1);
+        while(p.find(" )") != std::string::npos)
+            p.erase(p.find(" )"),1);
+    }
 }
 
 bool Convertor::secondCheck()
