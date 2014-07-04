@@ -49,8 +49,7 @@ void Convertor::initialize()
     if (!mInput || !mOutput)
         std::cerr << "Erreur dans l'ouverture d'un des fichiers..." << std::endl;
 
-    //TODO : Faire un include
-    mOutput << "#include " << std::endl << std::endl;
+    mOutput << "#include \"" << mClassName << ".hpp\"" << std::endl << std::endl;
 
     mLineCount = 0;
 	mCommented = false;
