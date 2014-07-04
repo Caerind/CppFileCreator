@@ -12,5 +12,4 @@ How To Use
 
 - Struct in class aren't supported
 - Template aren't supported
-- Crazy Multi-lines comments aren't supported
 

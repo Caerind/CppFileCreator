@@ -96,7 +96,7 @@ void Convertor::initializeNewLoop()
 
 bool Convertor::commentTester()
 {
-    if(mTempLine.find("/*") != std::string::npos && !mCommented)
+    if(mTempLine.find("/*") == 1 && !mCommented)
         mCommented = true;
     if(mTempLine.find("*/") != std::string::npos && mCommented)
         mCommented = false;
@@ -127,6 +127,8 @@ bool Convertor::cutLine()
     size_t found = mTempLine.find(";");
     if(found == std::string::npos)
         return true;
+    if(mTempLine.find("/*") != std::string::npos)
+        mCommented = true;
     mTempLine = mTempLine.substr(0,found);
     found = mTempLine.find("(");
     if(found == std::string::npos)
