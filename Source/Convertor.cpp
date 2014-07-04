@@ -113,11 +113,11 @@ bool Convertor::handleNamespace()
 
 bool Convertor::cutLine()
 {
-    if(mTempLine.back() == ';')
-        mTempLine.pop_back();
-    else
+    size_t found = mTempLine.find(";");
+    if(found == std::string::npos)
         return true;
-    size_t found = mTempLine.find("(");
+    mTempLine = mTempLine.substr(0,found);
+    found = mTempLine.find("(");
     if(found == std::string::npos)
         return true;
     std::string p = mTempLine.substr(found,mTempLine.size()-1);
