@@ -53,6 +53,7 @@ void Convertor::initialize()
     mOutput << "#include " << std::endl << std::endl;
 
     mLineCount = 0;
+	mCommented = false;
 }
 
 void Convertor::run()

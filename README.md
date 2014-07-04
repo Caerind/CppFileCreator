@@ -13,6 +13,6 @@ How To Use
 - Struct in class aren't supported
 - #include aren't supported
 - Template aren't supported
-- inline aren't supported
 - Default parameters aren't supported
+- Crazy Multi-lines comments aren't supported
 
