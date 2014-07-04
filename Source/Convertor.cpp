@@ -62,6 +62,8 @@ void Convertor::run()
         initializeNewLoop();
         if(firstCheck())
             continue;
+		if(handleNamespace())
+			continue;
         if(cutLine())
             continue;
         if(secondCheck())
@@ -95,6 +97,18 @@ bool Convertor::firstCheck()
     if (mTempLine.front() == '#' || mTempLine.front() == '{' || mTempLine.front() == '}' || mTempLine.front() == '/' || mTempLine.front() == '*')
         return true;
     return false;
+}
+
+bool Convertor::handleNamespace()
+{
+	size_t found = mTempLine.find("namespace ");
+	if(found != std::string::npos)
+    {
+		mOutput << mTempLine << std::endl << "{" << std::endl << std::endl;
+		mNamespaces.push_back(mTempLine.erase(0,10));
+		return true;
+	}
+	return false;
 }
 
 bool Convertor::cutLine()
@@ -209,7 +223,10 @@ void Convertor::write()
 
 void Convertor::stop()
 {
-    mInput.close();
+    for(std::string n : mNamespaces)
+		mOutput << "} // namespace " << n << std::endl << std::endl;
+
+	mInput.close();
     mOutput.close();
     std::cout << "Fichiers fermes !" << std::endl;
     std::cout << "Generation terminee !" << std::endl;

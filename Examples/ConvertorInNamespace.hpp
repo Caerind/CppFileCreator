@@ -8,6 +8,9 @@
 #include <fstream>
 #include <vector>
 
+namespace TestNspace
+{
+
 class Convertor
 {
     public:
@@ -63,5 +66,7 @@ class Convertor
         size_t mLineCount;
         Type mType;
 };
+
+}
 
 #endif // CONVERTOR_HPP

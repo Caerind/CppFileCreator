@@ -10,7 +10,6 @@ So I made this little program to convert easily .hpp/.h to .cpp :)
 How To Use
 ----------
 
-- Namespace aren't supported
 - Struct in class aren't supported
 - Don't use comments (simple and multi) after a line
 - Multi-line comments aren't supported
