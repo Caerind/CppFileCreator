@@ -10,6 +10,11 @@ So I made this little program to convert easily .hpp/.h to .cpp :)
 How To Use
 ----------
 
-- Struct in class aren't supported
-- Template aren't supported
+See the tutorial here : https://github.com/Cmdu76/CppFileCreator/tree/master/Examples/Tutorial
 
+
+
+Warnings
+--------
+
+- Struct in class aren't supported
