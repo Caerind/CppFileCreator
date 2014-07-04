@@ -60,6 +60,8 @@ void Convertor::run()
     while(std::getline(mInput,mTempLine))
     {
         initializeNewLoop();
+        if(commentTester())
+            continue;
         if(firstCheck())
             continue;
 		if(handleNamespace())
@@ -90,6 +92,15 @@ void Convertor::initializeNewLoop()
     std::cout << "Convertion de la ligne : " << mLineCount << " ..." << std::endl;
     while(mTempLine.front() == ' ') mTempLine.erase(0,1);
     while(mTempLine.find("\t") != std::string::npos) mTempLine.erase(0,2);
+}
+
+bool Convertor::commentTester()
+{
+    if(mTempLine.find("/*") != std::string::npos && !mCommented)
+        mCommented = true;
+    if(mTempLine.find("*/") != std::string::npos && mCommented)
+        mCommented = false;
+    return mCommented;
 }
 
 bool Convertor::firstCheck()

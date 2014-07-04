@@ -11,9 +11,18 @@
 class Convertor
 {
     public:
-        Convertor();
+        Convertor(); // a
 
     private:
+		
+		/*
+		Now, let's go for multi-lines comments !
+		Will this function be ignored ?
+		
+		void testFunc();
+		
+		Look at the .cpp !
+		*/
 
         void getInputFile();
         void getOutputFile();
@@ -23,7 +32,6 @@ class Convertor
         void run();
 
         void initializeNewLoop();
-        bool commentTester();
         bool firstCheck();
 		bool handleNamespace();
         bool cutLine();
@@ -63,7 +71,6 @@ class Convertor
 		std::vector<std::string> mNamespaces;
         size_t mLineCount;
         Type mType;
-        bool mCommented;
 };
 
 #endif // CONVERTOR_HPP
