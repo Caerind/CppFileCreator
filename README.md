@@ -1,9 +1,7 @@
 CppFileCreator
 ==============
 
-I love make all the functions of my class on the .hpp/.h before coding in the .cpp, but sometime it's very long to copy...
-
-So I made this little program to convert easily .hpp/.h to .cpp :)
+This is the source of a program I made to convert a .hpp/.h file into a .cpp file :)
 
 
 
@@ -11,10 +9,3 @@ How To Use
 ----------
 
 See the tutorial here : https://github.com/Cmdu76/CppFileCreator/tree/master/Examples/Tutorial
-
-
-
-Warnings
---------
-
-- Struct in class aren't supported

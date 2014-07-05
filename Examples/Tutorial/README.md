@@ -7,20 +7,20 @@ I've choose StateStack.hpp, a file from SFML Game Development Book (https://gith
 1 - Start
 ---------
 
-See StateStack.hpp to see it before any convertions.
+See StateStack-.hpp to see it before any convertions.
 
 
 2 - Manual Convertions
 ----------------------
 
 You need to apply some changes to the file before the convertion.
-See StateStack-.hpp
+See StateStack.hpp
 
 
 3 - Run CppFileCreator !
 ------------------------
 
-See StateStack-.cpp
+See StateStack.cpp
 
 
 

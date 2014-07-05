@@ -23,13 +23,15 @@ class Convertor
         void run();
 
         void initializeNewLoop();
-        bool commentTester();
+        bool commentTesterOpen();
+        void commentTesterClose();
         bool firstCheck();
 		bool handleNamespace();
+		bool handleStruct();
         bool cutLine();
         void handleParameters(std::string& p);
         bool secondCheck();
-        void handleStatic();
+        void handlePost();
         void handleCtor();
         void handleDtor();
         void handleVoid();
@@ -37,10 +39,7 @@ class Convertor
 
         void write();
 
-
         void stop();
-
-
 
         enum Type
         {
@@ -65,6 +64,8 @@ class Convertor
         size_t mLineCount;
         Type mType;
         bool mCommented;
+        bool mStruct;
+        std::string mStructName;
 };
 
 #endif // CONVERTOR_HPP

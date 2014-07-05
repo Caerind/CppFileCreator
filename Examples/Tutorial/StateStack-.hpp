@@ -14,9 +14,11 @@
 #include <map>
 
 
-/* Here our first modification */
-class sf::Event;
-class sf::RenderWindow;
+namespace sf
+{
+	class Event;
+	class RenderWindow;
+}
 
 class StateStack : private sf::NonCopyable
 {
@@ -31,10 +33,9 @@ class StateStack : private sf::NonCopyable
 
 	public:		
 		explicit			StateStack(State::Context context);
-		
-		
-		/* Here our second modification */
-		template <typename T> void registerState(States::ID stateID);
+
+		template <typename T>
+		void				registerState(States::ID stateID);
 
 		void				update(sf::Time dt);
 		void				draw();
@@ -70,8 +71,14 @@ class StateStack : private sf::NonCopyable
 		std::map<States::ID, std::function<State::Ptr()>>	mFactories;
 };
 
-/* Here the last modification : StateStack.inl may contains our template functions */
-#include "StateStack.inl"
-/* or you can just comment the template functions during the convertion */
+
+template <typename T>
+void StateStack::registerState(States::ID stateID)
+{
+	mFactories[stateID] = [this] ()
+	{
+		return State::Ptr(new T(*this, mContext));
+	};
+}
 
 #endif // BOOK_STATESTACK_HPP

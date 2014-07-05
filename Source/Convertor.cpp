@@ -53,6 +53,7 @@ void Convertor::initialize()
 
     mLineCount = 0;
 	mCommented = false;
+	mStruct = false;
 }
 
 void Convertor::run()
@@ -60,18 +61,26 @@ void Convertor::run()
     while(std::getline(mInput,mTempLine))
     {
         initializeNewLoop();
-        if(commentTester())
+
+        if(commentTesterOpen())
+        {
+            commentTesterClose();
             continue;
+        }
+
         if(firstCheck())
             continue;
 		if(handleNamespace())
 			continue;
+        if(handleStruct())
+            continue;
         if(cutLine())
             continue;
         if(secondCheck())
             continue;
-        handleStatic();
-        handleCtor();
+        handlePost();
+        if(mType == Type::None)
+            handleCtor();
         if(mType == Type::None)
             handleDtor();
         if(mType == Type::None)
@@ -91,16 +100,23 @@ void Convertor::initializeNewLoop()
     mType = Type::None;
     std::cout << "Convertion de la ligne : " << mLineCount << " ..." << std::endl;
     while(mTempLine.front() == ' ') mTempLine.erase(0,1);
-    while(mTempLine.find("\t") != std::string::npos) mTempLine.erase(0,2);
+    while(mTempLine.find("\t") != std::string::npos) mTempLine.erase(0,1);
+    while(mTempLine.find("\n") != std::string::npos) mTempLine.erase(0,1);
 }
 
-bool Convertor::commentTester()
+bool Convertor::commentTesterOpen()
 {
     if(mTempLine.find("/*") == 1 && !mCommented)
         mCommented = true;
-    if(mTempLine.find("*/") != std::string::npos && mCommented)
+    if(mTempLine.find("*/") == 1 && mCommented)
         mCommented = false;
     return mCommented;
+}
+
+void Convertor::commentTesterClose()
+{
+    if(mTempLine.find("*/") != std::string::npos && mCommented)
+        mCommented = false;
 }
 
 bool Convertor::firstCheck()
@@ -122,6 +138,23 @@ bool Convertor::handleNamespace()
 	return false;
 }
 
+bool Convertor::handleStruct()
+{
+	if(mTempLine.find("struct ") != std::string::npos && !mStruct)
+    {
+		mStruct = true;
+		mStructName = mTempLine.erase(0,7);
+		return true;
+	}
+	if(mTempLine.find("};") != std::string::npos && mStruct)
+    {
+        mStruct = false;
+        return true;
+    }
+	return false;
+}
+
+
 bool Convertor::cutLine()
 {
     size_t found = mTempLine.find(";");
@@ -129,10 +162,11 @@ bool Convertor::cutLine()
         return true;
     if(mTempLine.find("/*") != std::string::npos)
         mCommented = true;
-    mTempLine = mTempLine.substr(0,found);
+    mTempLine = mTempLine.substr(0,found+1);
     found = mTempLine.find("(");
-    if(found == std::string::npos)
+    if(found == std::string::npos ||(mTempLine.find(");") == std::string::npos && mTempLine.find(") const;") == std::string::npos))
         return true;
+    mTempLine.pop_back();
     std::string p = mTempLine.substr(found,mTempLine.size()-1);
     handleParameters(p);
     mTempLine = mTempLine.substr(0,found);
@@ -151,8 +185,9 @@ void Convertor::handleParameters(std::string& p)
         return;
     while(p.find("=") != std::string::npos)
     {
-        while(p.at(p.find("=")) != ',' && p.at(p.find("=")) != ')')
-            p.erase(p.find("="),1);
+        size_t found = p.find("=");
+        while(p.at(found) != ',' && p.at(found) != ')')
+            p.erase(found,1);
         while(p.find(" ,") != std::string::npos)
             p.erase(p.find(" ,"),1);
         while(p.find(" )") != std::string::npos)
@@ -164,15 +199,20 @@ bool Convertor::secondCheck()
 {
     if (mWords[0] == "typedef" || mWords[0] == "enum" || mWords[0] == "public:" || mWords[0] == "public" || mWords[0] == "protected:"
      || mWords[0] == "protected" || mWords[0] == "private:" || mWords[0] == "private" || mWords[0] == "namespace" || mWords[0] == "class"
-     || mWords[0] == "friend")
+     || mWords[0] == "friend" || mWords[0] == "template")
         return true;
     return false;
 }
 
-void Convertor::handleStatic()
+void Convertor::handlePost()
 {
     if(mWords[1] == "static")
         mWords.erase(mWords.begin());
+    if (mWords[0] == "explicit")
+    {
+        mWords.erase(mWords.begin());
+        mType = Type::Ctor;
+    }
 }
 
 void Convertor::handleCtor()
@@ -218,36 +258,72 @@ void Convertor::echoType()
 void Convertor::write()
 {
     if(mType != Type::None) mOutput << "////////////////////////////////////////////////////////////" << std::endl;
-    if(mType == Type::Ctor || mType == Type::Dtor)
+    if(!mStruct)
     {
-        mOutput << mClassName << "::" << mWords[0] << mWords[1] << std::endl;
-        mOutput << "{" << std::endl;
-        mOutput << "    " << std::endl;
-        mOutput << "}" << std::endl;
-    }
-    if(mType == Type::Void)
-    {
-        mOutput << mWords[0] << " " << mClassName << "::" << mWords[1] << mWords[2] << std::endl;
-        mOutput << "{" << std::endl;
-        mOutput << "    " << std::endl;
-        mOutput << "}" << std::endl;
-    }
-    if(mType == Type::Return)
-    {
-        std::string p = mWords.back();
-        mWords.pop_back();
-        std::string f = mWords.back();
-        mWords.pop_back();
-        for(auto w : mWords)
+        if(mType == Type::Ctor || mType == Type::Dtor)
         {
-            mOutput << w << " ";
+            mOutput << mClassName << "::" << mWords[0] << mWords[1] << std::endl;
+            mOutput << "{" << std::endl;
+            mOutput << "    " << std::endl;
+            mOutput << "}" << std::endl;
         }
-        mOutput << mClassName << "::" << f << p << std::endl;
-        mOutput << "{" << std::endl;
-        mOutput << "    return ;" << std::endl;
-        mOutput << "}" << std::endl;
+        if(mType == Type::Void)
+        {
+            mOutput << mWords[0] << " " << mClassName << "::" << mWords[1] << mWords[2] << std::endl;
+            mOutput << "{" << std::endl;
+            mOutput << "    " << std::endl;
+            mOutput << "}" << std::endl;
+        }
+        if(mType == Type::Return)
+        {
+            std::string p = mWords.back();
+            mWords.pop_back();
+            std::string f = mWords.back();
+            mWords.pop_back();
+            for(auto w : mWords)
+            {
+                mOutput << w << " ";
+            }
+            mOutput << mClassName << "::" << f << p << std::endl;
+            mOutput << "{" << std::endl;
+            mOutput << "    return ;" << std::endl;
+            mOutput << "}" << std::endl;
+        }
     }
-	mOutput << std::endl;
+    else
+    {
+        if(mType == Type::Ctor || mType == Type::Dtor)
+        {
+            mOutput << mClassName << "::" << mStructName << "::" << mWords[0] << mWords[1] << std::endl;
+            mOutput << "{" << std::endl;
+            mOutput << "    " << std::endl;
+            mOutput << "}" << std::endl;
+        }
+        if(mType == Type::Void)
+        {
+            mOutput << mWords[0] << " " << mClassName << "::" << mStructName << "::" << mWords[1] << mWords[2] << std::endl;
+            mOutput << "{" << std::endl;
+            mOutput << "    " << std::endl;
+            mOutput << "}" << std::endl;
+        }
+        if(mType == Type::Return)
+        {
+            std::string p = mWords.back();
+            mWords.pop_back();
+            std::string f = mWords.back();
+            mWords.pop_back();
+            for(auto w : mWords)
+            {
+                mOutput << w << " ";
+            }
+            mOutput << mClassName << "::"  << mStructName << "::" << f << p << std::endl;
+            mOutput << "{" << std::endl;
+            mOutput << "    return ;" << std::endl;
+            mOutput << "}" << std::endl;
+        }
+    }
+	if(mType != Type::None)
+        mOutput << std::endl;
 }
 
 void Convertor::stop()
