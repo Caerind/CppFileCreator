@@ -121,7 +121,14 @@ void Convertor::commentTesterClose()
 
 bool Convertor::firstCheck()
 {
-    if (mTempLine.front() == '#' || mTempLine.front() == '{' || mTempLine.front() == '}' || mTempLine.front() == '/' || mTempLine.front() == '*')
+    if(mTempLine.find("};") != std::string::npos && mStruct)
+    {
+        mStruct = false;
+        return true;
+    }
+	
+	
+	if (mTempLine.front() == '#' || mTempLine.front() == '{' || mTempLine.front() == '}' || mTempLine.front() == '/' || mTempLine.front() == '*')
         return true;
     return false;
 }
@@ -146,11 +153,6 @@ bool Convertor::handleStruct()
 		mStructName = mTempLine.erase(0,7);
 		return true;
 	}
-	if(mTempLine.find("};") != std::string::npos && mStruct)
-    {
-        mStruct = false;
-        return true;
-    }
 	return false;
 }
 
