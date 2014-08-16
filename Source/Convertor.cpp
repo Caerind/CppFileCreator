@@ -208,7 +208,7 @@ bool Convertor::secondCheck()
 
 void Convertor::handlePost()
 {
-    if(mWords[1] == "static")
+    if(mWords[0] == "static" || mWords[0] == "virtual")
         mWords.erase(mWords.begin());
     if (mWords[0] == "explicit")
     {
