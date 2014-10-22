@@ -28,16 +28,18 @@ class Test
         void a();
         int b();
         const& int c();
+
+	virtual void render() =0;
 	
-	protected:
-		void a(std::string a);
-		int b(std:string const& b);
-		std::string const& getTest(std::string const& s);
+    protected:
+	void a(std::string a);
+	int b(std:string const& b);
+	std::string const& getTest(std::string const& s);
 		
     private:
         std::string mFile;
-		int a;
-		bool b;
+	int a;
+	bool b;
         std::vector<std::string> mWords;
         size_t mLineCount;
         Type mType;

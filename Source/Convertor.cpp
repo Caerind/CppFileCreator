@@ -1,19 +1,13 @@
 #include "Convertor.hpp"
 
-Convertor::Convertor()
+Convertor::Convertor(std::string filename)
 {
-    getInputFile();
+  	mInputFile = filename;
     getOutputFile();
     getClassName();
     initialize();
     run();
     stop();
-}
-
-void Convertor::getInputFile()
-{
-    std::cout << "Donnez le lien vers le fichier .h/.hpp a convertir :" << std::endl;
-    std::cin >> mInputFile;
 }
 
 void Convertor::getOutputFile()
@@ -52,8 +46,8 @@ void Convertor::initialize()
     mOutput << "#include \"" << mClassName << ".hpp\"" << std::endl << std::endl;
 
     mLineCount = 0;
-	mCommented = false;
-	mStruct = false;
+    mCommented = false;
+    mStruct = false;
 }
 
 void Convertor::run()
@@ -70,8 +64,8 @@ void Convertor::run()
 
         if(firstCheck())
             continue;
-		if(handleNamespace())
-			continue;
+	if(handleNamespace())
+	    continue;
         if(handleStruct())
             continue;
         if(cutLine())
@@ -127,33 +121,32 @@ bool Convertor::firstCheck()
         return true;
     }
 	
-	
-	if (mTempLine.front() == '#' || mTempLine.front() == '{' || mTempLine.front() == '}' || mTempLine.front() == '/' || mTempLine.front() == '*')
+    if (mTempLine.front() == '#' || mTempLine.front() == '{' || mTempLine.front() == '}' || mTempLine.front() == '/' || mTempLine.front() == '*')
         return true;
     return false;
 }
 
 bool Convertor::handleNamespace()
 {
-	size_t found = mTempLine.find("namespace ");
-	if(found != std::string::npos)
+    size_t found = mTempLine.find("namespace ");
+    if(found != std::string::npos)
     {
-		mOutput << mTempLine << std::endl << "{" << std::endl << std::endl;
-		mNamespaces.push_back(mTempLine.erase(0,10));
-		return true;
-	}
-	return false;
+	mOutput << mTempLine << std::endl << "{" << std::endl << std::endl;
+	mNamespaces.push_back(mTempLine.erase(0,10));
+	return true;
+    }
+    return false;
 }
 
 bool Convertor::handleStruct()
 {
-	if(mTempLine.find("struct ") != std::string::npos && !mStruct)
+    if(mTempLine.find("struct ") != std::string::npos && !mStruct)
     {
-		mStruct = true;
-		mStructName = mTempLine.erase(0,7);
-		return true;
-	}
-	return false;
+	mStruct = true;
+	mStructName = mTempLine.erase(0,7);
+	return true;
+    }
+    return false;
 }
 
 
@@ -203,13 +196,16 @@ bool Convertor::secondCheck()
      || mWords[0] == "protected" || mWords[0] == "private:" || mWords[0] == "private" || mWords[0] == "namespace" || mWords[0] == "class"
      || mWords[0] == "friend" || mWords[0] == "template")
         return true;
+
+    if (mWords[0] == "virtual" && mWords[mWords.size()-1].find("0") != std::string::npos)
+        return true;
     return false;
 }
 
 void Convertor::handlePost()
 {
     if(mWords[0] == "static" || mWords[0] == "virtual")
-        mWords.erase(mWords.begin());
+         mWords.erase(mWords.begin());
     if (mWords[0] == "explicit")
     {
         mWords.erase(mWords.begin());

@@ -11,11 +11,9 @@
 class Convertor
 {
     public:
-        Convertor();
+        Convertor(std::string filename);
 
     private:
-
-        void getInputFile();
         void getOutputFile();
         void getClassName();
         void initialize();
@@ -49,8 +47,6 @@ class Convertor
             Void = 3,
             Return = 4,
         };
-
-
 
     private:
         std::string mInputFile;
