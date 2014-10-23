@@ -3,24 +3,27 @@
 Convertor::Convertor(std::string filename)
 {
   	mInputFile = filename;
-    getOutputFile();
+    if(!getOutputFile())
+    	return;
     getClassName();
-    initialize();
+    if(!initialize())
+    	return;
     run();
     stop();
 }
 
-void Convertor::getOutputFile()
+bool Convertor::getOutputFile()
 {
     size_t found = mInputFile.rfind(".");
     if (found == std::string::npos)
     {
-        std::cerr << "Erreur dans le fichier entre..." << std::endl;
+        std::cerr << "Erreur dans le fichier entré..." << std::endl;
         mOutputFile = "";
+        return false;
     }
     else
         mOutputFile = mInputFile.substr(0, found) + ".cpp";
-    std::cout << "Fichier de sortie : " << mOutputFile << std::endl;
+    return true;
 }
 
 void Convertor::getClassName()
@@ -32,22 +35,33 @@ void Convertor::getClassName()
         mClassName = mInputFile;
     while(mClassName.find("/") != std::string::npos)
         mClassName = mClassName.substr(mClassName.find("/")+1, mClassName.size()-1);
-    std::cout << "La convertion sur la classe " << mClassName << " va commencer..." << std::endl;
 }
 
-void Convertor::initialize()
+bool Convertor::initialize()
 {
     mInput.open(mInputFile.c_str());
     mOutput.open(mOutputFile.c_str());
 
     if (!mInput || !mOutput)
-        std::cerr << "Erreur dans l'ouverture d'un des fichiers..." << std::endl;
+    {
+    	std::cerr << "Erreur dans l'ouverture d'un des fichiers..." << std::endl;
+    	return false;
+    }
 
-    mOutput << "#include \"" << mClassName << ".hpp\"" << std::endl << std::endl;
+    mOutput << "/** //////////////////////////////////////////////////// **/" << std::endl;
+    mOutput << "/// Project : -ProjectName-                              ///" << std::endl;
+    mOutput << "/// File : --------.cpp                                  ///" << std::endl;
+    mOutput << "/// Author : -RealName- -DevAlias-                       ///" << std::endl;
+    mOutput << "/// Date : __/__/__                                      ///" << std::endl;
+    mOutput << "/// Desc : This is a description of what my class do     ///" << std::endl;
+    mOutput << "/** //////////////////////////////////////////////////// **/" << std::endl << std::endl << std::endl;
+
+    mOutput << "#include \"" << mClassName << ".h\"  // Edit me !" << std::endl << std::endl;
 
     mLineCount = 0;
     mCommented = false;
     mStruct = false;
+    return true;
 }
 
 void Convertor::run()
@@ -64,8 +78,8 @@ void Convertor::run()
 
         if(firstCheck())
             continue;
-	if(handleNamespace())
-	    continue;
+		if(handleNamespace())
+	    	continue;
         if(handleStruct())
             continue;
         if(cutLine())
@@ -81,7 +95,6 @@ void Convertor::run()
             handleVoid();
         if(mType == Type::None)
             mType = Type::Return;
-        echoType();
 
         write();
     }
@@ -92,7 +105,6 @@ void Convertor::initializeNewLoop()
     mLineCount++;
     mWords.clear();
     mType = Type::None;
-    std::cout << "Convertion de la ligne : " << mLineCount << " ..." << std::endl;
     while(mTempLine.front() == ' ') mTempLine.erase(0,1);
     while(mTempLine.find("\t") != std::string::npos) mTempLine.erase(0,1);
     while(mTempLine.find("\n") != std::string::npos) mTempLine.erase(0,1);
@@ -120,7 +132,7 @@ bool Convertor::firstCheck()
         mStruct = false;
         return true;
     }
-	
+
     if (mTempLine.front() == '#' || mTempLine.front() == '{' || mTempLine.front() == '}' || mTempLine.front() == '/' || mTempLine.front() == '*')
         return true;
     return false;
@@ -131,9 +143,9 @@ bool Convertor::handleNamespace()
     size_t found = mTempLine.find("namespace ");
     if(found != std::string::npos)
     {
-	mOutput << mTempLine << std::endl << "{" << std::endl << std::endl;
-	mNamespaces.push_back(mTempLine.erase(0,10));
-	return true;
+		mOutput << mTempLine << std::endl << "{" << std::endl << std::endl;
+		mNamespaces.push_back(mTempLine.erase(0,10));
+		return true;
     }
     return false;
 }
@@ -142,9 +154,9 @@ bool Convertor::handleStruct()
 {
     if(mTempLine.find("struct ") != std::string::npos && !mStruct)
     {
-	mStruct = true;
-	mStructName = mTempLine.erase(0,7);
-	return true;
+		mStruct = true;
+		mStructName = mTempLine.erase(0,7);
+		return true;
     }
     return false;
 }
@@ -193,8 +205,7 @@ void Convertor::handleParameters(std::string& p)
 bool Convertor::secondCheck()
 {
     if (mWords[0] == "typedef" || mWords[0] == "enum" || mWords[0] == "public:" || mWords[0] == "public" || mWords[0] == "protected:"
-     || mWords[0] == "protected" || mWords[0] == "private:" || mWords[0] == "private" || mWords[0] == "namespace" || mWords[0] == "class"
-     || mWords[0] == "friend" || mWords[0] == "template")
+     || mWords[0] == "protected" || mWords[0] == "private:" || mWords[0] == "private" || mWords[0] == "namespace" || mWords[0] == "class" || mWords[0] == "friend" || mWords[0] == "template")
         return true;
 
     if (mWords[0] == "virtual" && mWords[mWords.size()-1].find("0") != std::string::npos)
@@ -229,28 +240,6 @@ void Convertor::handleVoid()
 {
     if(mWords.size() == 3 && mWords[0] == "void")
         mType = Type::Void;
-}
-
-void Convertor::echoType()
-{
-    switch(mType)
-    {
-        case Type::Ctor:
-            std::cout << "Le type est : Ctor" << std::endl;
-            break;
-        case Type::Dtor:
-            std::cout << "Le type est : Dtor" << std::endl;
-            break;
-        case Type::Void:
-            std::cout << "Le type est : Void" << std::endl;
-            break;
-        case Type::Return:
-            std::cout << "Le type est : Return" << std::endl;
-            break;
-        default:
-            std::cout << "Le type est : None" << std::endl;
-            break;
-    }
 }
 
 void Convertor::write()
@@ -331,6 +320,5 @@ void Convertor::stop()
 
 	mInput.close();
     mOutput.close();
-    std::cout << "Fichiers fermes !" << std::endl;
-    std::cout << "Generation terminee !" << std::endl;
+    std::cout << "Fichier généré !" << std::endl;
 }

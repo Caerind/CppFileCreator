@@ -1,3 +1,11 @@
+/** //////////////////////////////////////////////////// **/
+/// Project : -ProjectName-                              ///
+/// File : --------.hpp                                  ///
+/// Author : -RealName- -DevAlias-                       ///
+/// Date : __/__/__                                      ///
+/// Desc : This is a description of what my class do     ///
+/** //////////////////////////////////////////////////// **/
+
 #ifndef TEST_HPP
 #define TEST_HPP
 
@@ -5,7 +13,9 @@
 #include <string>
 #include <vector>
 
-class Test
+class TestFile;
+
+class Test : public TestTest
 {
     public:
         Test();

@@ -1,4 +1,13 @@
-#include "Test.hpp"
+/** //////////////////////////////////////////////////// **/
+/// Project : -ProjectName-                              ///
+/// File : --------.cpp                                  ///
+/// Author : -RealName- -DevAlias-                       ///
+/// Date : __/__/__                                      ///
+/// Desc : This is a description of what my class do     ///
+/** //////////////////////////////////////////////////// **/
+
+
+#include "Test.h"  // Edit me !
 
 ////////////////////////////////////////////////////////////
 Test::Test()

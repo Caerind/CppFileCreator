@@ -14,9 +14,9 @@ class Convertor
         Convertor(std::string filename);
 
     private:
-        void getOutputFile();
+        bool getOutputFile();
         void getClassName();
-        void initialize();
+        bool initialize();
 
         void run();
 
@@ -33,7 +33,6 @@ class Convertor
         void handleCtor();
         void handleDtor();
         void handleVoid();
-        void echoType();
 
         void write();
 
