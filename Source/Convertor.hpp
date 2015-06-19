@@ -16,6 +16,7 @@ class Convertor
     private:
         bool getOutputFile();
         void getClassName();
+        std::string getExt();
         bool initialize();
 
         void run();

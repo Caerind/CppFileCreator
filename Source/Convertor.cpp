@@ -17,7 +17,7 @@ bool Convertor::getOutputFile()
     size_t found = mInputFile.rfind(".");
     if (found == std::string::npos)
     {
-        std::cerr << "Erreur dans le fichier entré..." << std::endl;
+        std::cerr << "Error with filename..." << std::endl;
         mOutputFile = "";
         return false;
     }
@@ -35,6 +35,16 @@ void Convertor::getClassName()
         mClassName = mInputFile;
     while(mClassName.find("/") != std::string::npos)
         mClassName = mClassName.substr(mClassName.find("/")+1, mClassName.size()-1);
+    while(mClassName.find("\\") != std::string::npos)
+        mClassName = mClassName.substr(mClassName.find("\\")+1, mClassName.size()-1);
+}
+
+std::string Convertor::getExt()
+{
+    size_t found = mInputFile.rfind(".");
+    if (found != std::string::npos)
+        return mInputFile.substr(found+1,mInputFile.size()-1);
+    return "";
 }
 
 bool Convertor::initialize()
@@ -44,19 +54,11 @@ bool Convertor::initialize()
 
     if (!mInput || !mOutput)
     {
-    	std::cerr << "Erreur dans l'ouverture d'un des fichiers..." << std::endl;
+    	std::cerr << "Error cannot open/write file(s)..." << std::endl;
     	return false;
     }
 
-    mOutput << "/** //////////////////////////////////////////////////// **/" << std::endl;
-    mOutput << "/// Project : -ProjectName-                              ///" << std::endl;
-    mOutput << "/// File : --------.cpp                                  ///" << std::endl;
-    mOutput << "/// Author : -RealName- -DevAlias-                       ///" << std::endl;
-    mOutput << "/// Date : __/__/__                                      ///" << std::endl;
-    mOutput << "/// Desc : This is a description of what my class do     ///" << std::endl;
-    mOutput << "/** //////////////////////////////////////////////////// **/" << std::endl << std::endl << std::endl;
-
-    mOutput << "#include \"" << mClassName << ".h\"  // Edit me !" << std::endl << std::endl;
+    mOutput << "#include \"" << mClassName << "." << getExt() << "\"" << std::endl << std::endl;
 
     mLineCount = 0;
     mCommented = false;
@@ -320,5 +322,5 @@ void Convertor::stop()
 
 	mInput.close();
     mOutput.close();
-    std::cout << "Fichier généré !" << std::endl;
+    std::cout << "File created !" << std::endl;
 }
